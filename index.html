@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Receive Data from Bubble</title>
+  <script>
+    // Function to fetch data from Bubble
+    function fetchDataFromBubble() {
+      console.log("Fetching data from Bubble...");
+      fetch('https://suyash8213.bubbleapps.io/version-test/api/1.1/obj/tempdata', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        const latestEntry = data.response.results[data.response.results.length - 1];
+        document.getElementById('result').textContent = JSON.stringify(latestEntry, null, 2);
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        document.getElementById('result').textContent = 'Error: ' + error;
+      });
+    }
+
+    // Listen for post messages from Bubble
+    window.addEventListener('message', function(event) {
+      console.log("Message received: ", event.data); // Log the message received
+      if (event.data === "update_data") {
+        console.log("Triggering data fetch based on message...");
+        fetchDataFromBubble();
+      }
+    }, false);
+  </script>
+</head>
+<body>
+
+  <h1>Receive Data from Bubble</h1>
+
+  <p>Click the button below to fetch data from Bubble:</p>
+
+  <!-- Button to manually fetch data (Optional) -->
+  <button onclick="fetchDataFromBubble()" style="padding: 10px 20px; font-size: 16px; background-color: #007bff; color: white; border: none; border-radius: 5px;">Fetch Data from Bubble</button>
+
+  <!-- The result from Bubble will be shown here -->
+  <pre id="result" style="background-color: #f0f0f0; padding: 10px; margin-top: 20px;"></pre>
+
+</body>
+</html>
