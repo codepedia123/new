@@ -1,51 +1,59 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Receive Data from Bubble</title>
-  <script>
-    // Function to fetch data from Bubble
-    function fetchDataFromBubble() {
-      console.log("Fetching data from Bubble...");
-      fetch('https://suyash8213.bubbleapps.io/version-test/api/1.1/obj/tempdata', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      })
-      .then(response => response.json())
-      .then(data => {
-        const latestEntry = data.response.results[data.response.results.length - 1];
-        document.getElementById('result').textContent = JSON.stringify(latestEntry, null, 2);
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        document.getElementById('result').textContent = 'Error: ' + error;
-      });
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Parameters Example</title>
+    <script>
+        // Function to parse URL parameters and display them
+        function displayURLData() {
+            const params = new URLSearchParams(window.location.search);
 
-    // Listen for post messages from Bubble
-    window.addEventListener('message', function(event) {
-      console.log("Message received: ", event.data); // Log the message received
-      if (event.data === "update_data") {
-        console.log("Triggering data fetch based on message...");
-        fetchDataFromBubble();
-      }
-    }, false);
-  </script>
+            // Get the data from URL parameters
+            const name = params.get('name');
+            const message = params.get('message');
+
+            // Display the data in labels
+            document.getElementById('nameLabel').textContent = name || 'No Name Provided';
+            document.getElementById('messageLabel').textContent = message || 'No Message Provided';
+        }
+
+        // Function to update the URL and send data
+        function sendDataToBubble() {
+            const newName = document.getElementById('nameInput').value || 'DefaultName';
+            const newMessage = document.getElementById('messageInput').value || 'DefaultMessage';
+
+            // Update the URL with new parameters
+            const newURL = `${window.location.pathname}?name=${encodeURIComponent(newName)}&message=${encodeURIComponent(newMessage)}`;
+            history.pushState(null, '', newURL);
+
+            // Call displayURLData to reflect the updated URL data on the page
+            displayURLData();
+        }
+
+        // Run displayURLData when the page loads
+        window.onload = displayURLData;
+
+        // Add event listener for detecting URL changes
+        window.addEventListener('popstate', displayURLData);
+    </script>
 </head>
 <body>
+    <h1>URL Parameters Example</h1>
 
-  <h1>Receive Data from Bubble</h1>
+    <!-- Labels to display URL parameters -->
+    <p><strong>Name: </strong><span id="nameLabel"></span></p>
+    <p><strong>Message: </strong><span id="messageLabel"></span></p>
 
-  <p>Click the button below to fetch data from Bubble:</p>
+    <!-- Input fields to change data -->
+    <label for="nameInput">Name:</label>
+    <input type="text" id="nameInput" placeholder="Enter Name">
+    <br><br>
+    <label for="messageInput">Message:</label>
+    <input type="text" id="messageInput" placeholder="Enter Message">
+    <br><br>
 
-  <!-- Button to manually fetch data (Optional) -->
-  <button onclick="fetchDataFromBubble()" style="padding: 10px 20px; font-size: 16px; background-color: #007bff; color: white; border: none; border-radius: 5px;">Fetch Data from Bubble</button>
-
-  <!-- The result from Bubble will be shown here -->
-  <pre id="result" style="background-color: #f0f0f0; padding: 10px; margin-top: 20px;"></pre>
-
+    <!-- Button to trigger URL change -->
+    <button onclick="sendDataToBubble()">Update URL and Send Data</button>
 </body>
 </html>
